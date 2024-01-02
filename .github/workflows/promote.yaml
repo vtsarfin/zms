@@ -52,8 +52,11 @@ env:
 jobs:
   promote:
     # The type of runner that the job will run on
-    runs-on: [self-hosted]
+    runs-on: ubuntu-latest
     steps:
+      - name: echo vars
+        run: |
+          echo hui
       - name: argo cli install
         run: |
          # Download the binary
@@ -62,25 +65,3 @@ jobs:
             chmod +x argo-linux-amd64
             sudo mv ./argo-linux-amd64 /usr/local/bin/argo
             argo version          
-      - name: Copy container tag
-        if:  ${{ inputs.promote_container }}
-        uses: canastro/copy-file-action@master
-        with:
-          source: "gitops/environments/envs/${{ inputs.source_env }}/version.yaml"
-          target: "gitops/environments/envs/${{ inputs.target_env }}/version.yaml"
-      - name: Copy configmaps
-        if:  ${{ inputs.promote_configmaps }}
-        uses: canastro/copy-file-action@master
-        with:
-          source: "gitops/environments/envs/${{ inputs.source_env }}/cm.yaml"
-          target: "gitops/environments/envs/${{ inputs.target_env }}/cm.yaml"
-
-      - name: Copy settings
-        if:  ${{ inputs.promote_settings }}
-        uses: canastro/copy-file-action@master
-        with:
-          source: "gitops/environments/envs/${{ inputs.source_env }}/settings.yaml"
-          target: "gitops/environments/envs/${{ inputs.target_env }}/settings.yaml"
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: ${{ inputs.messsage }}
