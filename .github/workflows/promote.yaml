@@ -46,6 +46,7 @@ on:
 env:
   REPO_NAME: ${{ github.repository }}
   ARGO_NAMESPACE: "argo"
+  PROMOTE_CONTAINER: "{{inputs.promote_container}}"
 
 
 
@@ -56,7 +57,8 @@ jobs:
     steps:
       - name: echo vars
         run: |
-          echo hui
+          if [[ $PROMOTE_CONTAINER ]]
+          echo P_C $PROMOTE_CONTAINER
       - name: argo cli install
         run: |
          # Download the binary
