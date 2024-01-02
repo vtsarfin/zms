@@ -78,7 +78,7 @@ jobs:
               -p promote_container=${{inputs.promote_container}} \
               -p promote_settings=${{inputs.promote_settings}} \
               -p promote_configmaps=${{inputs.promote_configmaps}} \
-              -p commit_message="${{ inputs.commit_message }}" \
+              -p commit_message=\""${{ inputs.commit_message }}"\" \
               --wait --log
 
         
