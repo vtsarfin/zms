@@ -46,7 +46,6 @@ on:
 env:
   REPO_NAME: ${{ github.repository }}
   ARGO_NAMESPACE: "argo"
-  PROMOTE_CONTAINER: "${{ inputs.promote_container }}"
 
 
 
@@ -69,3 +68,18 @@ jobs:
             chmod +x argo-linux-amd64
             sudo mv ./argo-linux-amd64 /usr/local/bin/argo
             argo version          
+      - name: argo run
+        run:
+          echo argo submit .argo/version-changer-wf.yaml \
+              -p repo=git@github.com:${REPO_NAME}.git \
+              -p env-path="gitops/environments/envs" \
+              -p source_env="${{inputs.source_env}}" \
+              -p target_env_env="${{inputs.target_env}}" \
+              -p promote_container=${{inputs.promote_container}} \
+              -p promote_settings=${{inputs.promote_settings}} \
+              -p promote_configmaps=${{inputs.promote_configmaps}} \
+              -p commit_message="${{ inputs.commit_message }}" \
+              --wait --log
+
+        
+
