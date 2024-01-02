@@ -1,0 +1,86 @@
+# Promote a GitOps application from one environment to the next
+
+name: Promote application
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      source_env:
+        description: 'Source environment'
+        required: true
+        default: 'dev' 
+        type: choice
+        options:
+        - dev
+        - sta
+        - prod 
+      target_env:
+        description: 'Target environment'
+        required: true
+        default: 'sta' 
+        type: choice
+        options:
+        - dev
+        - sta
+        - prod 
+      promote_container:
+        description: 'Promote container tag'
+        required: true 
+        type: boolean 
+        default: true
+      promote_configmaps:
+        description: 'Also promote configmap settings'
+        required: true
+        type: boolean
+      promote_settings:
+        description: 'Also promote application settings'
+        required: true
+        type: boolean
+      messsage:
+        description: 'Commit message'
+        required: true
+        type: string
+        default: 'Application promotion'
+env:
+  REPO_NAME: ${{ github.repository }}
+  ARGO_NAMESPACE: "argo"
+
+
+
+jobs:
+  promote:
+    # The type of runner that the job will run on
+    runs-on: [self-hosted]
+    steps:
+      - name: argo cli install
+        run: |
+         # Download the binary
+            curl -sLO https://github.com/argoproj/argo-workflows/releases/download/v3.5.2/argo-linux-amd64.gz
+            gunzip argo-linux-amd64.gz
+            chmod +x argo-linux-amd64
+            sudo mv ./argo-linux-amd64 /usr/local/bin/argo
+            argo version          
+      - name: Copy container tag
+        if:  ${{ inputs.promote_container }}
+        uses: canastro/copy-file-action@master
+        with:
+          source: "gitops/environments/envs/${{ inputs.source_env }}/version.yaml"
+          target: "gitops/environments/envs/${{ inputs.target_env }}/version.yaml"
+      - name: Copy configmaps
+        if:  ${{ inputs.promote_configmaps }}
+        uses: canastro/copy-file-action@master
+        with:
+          source: "gitops/environments/envs/${{ inputs.source_env }}/cm.yaml"
+          target: "gitops/environments/envs/${{ inputs.target_env }}/cm.yaml"
+
+      - name: Copy settings
+        if:  ${{ inputs.promote_settings }}
+        uses: canastro/copy-file-action@master
+        with:
+          source: "gitops/environments/envs/${{ inputs.source_env }}/settings.yaml"
+          target: "gitops/environments/envs/${{ inputs.target_env }}/settings.yaml"
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: ${{ inputs.messsage }}
