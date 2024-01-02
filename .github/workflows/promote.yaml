@@ -38,7 +38,7 @@ on:
         description: 'Also promote application settings'
         required: true
         type: boolean
-      messsage:
+      commit_message:
         description: 'Commit message'
         required: true
         type: string
@@ -78,7 +78,7 @@ jobs:
               -p promote_container=${{inputs.promote_container}} \
               -p promote_settings=${{inputs.promote_settings}} \
               -p promote_configmaps=${{inputs.promote_configmaps}} \
-              -p commit_message="${{ inputs.message }}" \
+              -p commit_message="${{ inputs.commit_message }}" \
               --wait --log
 
         
