@@ -46,7 +46,7 @@ on:
 env:
   REPO_NAME: ${{ github.repository }}
   ARGO_NAMESPACE: "argo"
-  PROMOTE_CONTAINER: "{{ inputs.promote_container }}"
+  PROMOTE_CONTAINER: "${{ inputs.promote_container }}"
 
 
 
