@@ -47,19 +47,11 @@ env:
   REPO_NAME: ${{ github.repository }}
   ARGO_NAMESPACE: "argo"
 
-
-
 jobs:
   promote:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     steps:
-      - name: echo vars
-        run: |
-          if [[ $PROMOTE_CONTAINER ]]
-          then
-            echo P_C $PROMOTE_CONTAINER
-          fi
       - name: argo cli install
         run: |
          # Download the binary
@@ -70,7 +62,7 @@ jobs:
             argo version          
       - name: argo run
         run:
-          echo argo submit .argo/version-changer-wf.yaml \
+          echo argo submit .argo/promote-wf.yaml \
               -p repo=git@github.com:${REPO_NAME}.git \
               -p env-path="gitops/environments/envs" \
               -p source_env="${{inputs.source_env}}" \
@@ -80,6 +72,4 @@ jobs:
               -p promote_configmaps=${{inputs.promote_configmaps}} \
               -p commit_message=\""${{ inputs.commit_message }}"\" \
               --wait --log
-
-        
 
